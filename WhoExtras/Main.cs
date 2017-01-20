@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Crimson.CustomEvents.Extensions;
+using Microsoft.Xna.Framework;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
@@ -35,6 +38,28 @@ namespace WhoExtras
 			});
 		}
 
+		private static IEnumerable<string> GetPlayers(bool pvp, bool displayid, bool realsender)
+		{
+			var players = pvp
+				? TShock.Players.Where(p => p != null && p.Active && p.TPlayer.hostile)
+				: TShock.Players.Where(p => p != null && p.Active);
+
+			Func<TSPlayer, string> namer;
+
+			if (realsender)
+				namer = p => p.Name.Colorize(new Color(p.Group.R, p.Group.G, p.Group.B));
+			else
+				namer = p => p.Name;
+
+			return displayid
+				? players.Select(p => string.Format("{0} (IX: {1}){2}",
+					namer(p),
+					p.Index,
+					p.User != null ? $" (ID: {p.User.ID})" : string.Empty
+				))
+				: players.Select(p => namer(p));
+		}
+
 		private static void ListConnectedPlayers(CommandArgs args)
 		{
 			bool invalidUsage = args.Parameters.Count > 3;
@@ -42,6 +67,7 @@ namespace WhoExtras
 			var displayIdsRequested = false;
 			var displaypvp = false;
 			var pageNumber = 1;
+
 			if (!invalidUsage)
 				foreach (string parameter in args.Parameters)
 				{
@@ -74,9 +100,8 @@ namespace WhoExtras
 				return;
 			}
 
-			Func<string> param = () =>
+			Func<string> getParam = () =>
 			{
-
 				if (displayIdsRequested && displaypvp)
 				{
 					return " -i -p";
@@ -90,9 +115,7 @@ namespace WhoExtras
 				return displayIdsRequested ? " -i" : string.Empty;
 			};
 
-			var players = displaypvp
-				? TShock.Players.Where(p => p != null && p.Active && p.TPlayer.hostile).Select(p => p.Name).ToList()
-				: TShock.Utils.GetPlayers(displayIdsRequested);
+			var players = GetPlayers(displaypvp, displayIdsRequested, args.Player.RealPlayer).ToList();
 
 			args.Player.SendSuccessMessage("Online Players{2}: ({0}/{1})",
 				players.Count,
@@ -104,8 +127,10 @@ namespace WhoExtras
 				new PaginationTools.Settings
 				{
 					IncludeHeader = false,
+					LineTextColor = Color.White,
+					FooterTextColor = Color.Green,
 					FooterFormat =
-						string.Format("Type {0}who{1} {{0}} for more.", Commands.Specifier, param())
+						string.Format("Type {0}who{1} {{0}} for more.", Commands.Specifier, getParam())
 				}
 			);
 		}
@@ -121,6 +146,7 @@ namespace WhoExtras
 		public override string Name => "WhoExtras";
 		public override string Author => "Newy";
 		public override string Description => "Extends the /who command with extra features.";
+		public override Version Version => System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
 
 		#endregion
 	}
