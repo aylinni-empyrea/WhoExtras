@@ -77,7 +77,7 @@ namespace WhoExtras
 						continue;
 					}
 
-					if (parameter.Equals("-pvp", StringComparison.InvariantCultureIgnoreCase))
+					if (parameter.Equals("-p", StringComparison.InvariantCultureIgnoreCase))
 					{
 						displaypvp = true;
 						continue;
@@ -91,7 +91,7 @@ namespace WhoExtras
 				}
 			if (invalidUsage)
 			{
-				args.Player.SendErrorMessage("Invalid usage, proper usage: {0}who [-pvp] [-i] [pagenumber]", Commands.Specifier);
+				args.Player.SendErrorMessage("Invalid usage, proper usage: {0}who [-p] [-i] [pagenumber]", Commands.Specifier);
 				return;
 			}
 			if (displayIdsRequested && !args.Player.HasPermission(Permissions.seeids))
