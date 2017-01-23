@@ -123,7 +123,7 @@ namespace WhoExtras
 				displaypvp ? " (with PvP enabled)" : string.Empty);
 
 			PaginationTools.SendPage(
-				args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(players),
+				args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(players, maxCharsPerLine: 140),
 				new PaginationTools.Settings
 				{
 					IncludeHeader = false,
