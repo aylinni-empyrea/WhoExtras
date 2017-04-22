@@ -9,7 +9,7 @@ using TShockAPI;
 
 namespace WhoExtras
 {
-	[ApiVersion(2, 0)]
+	[ApiVersion(2, 1)]
 	public class WhoExtras : TerrariaPlugin
 	{
 		public WhoExtras(Main game) : base(game)
